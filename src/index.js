@@ -7,6 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // const imageContentDiv = document.querySelector('#image_content')
   const imgCard = document.querySelector('#image_card')
 
+  let image = new Image()
+  image.loadImage()
+  image.renderCommentList()
+
+  
+
   fetch(imageURL)
     .then(res => res.json())
     .then(img => {
@@ -38,15 +44,15 @@ document.addEventListener('DOMContentLoaded', function() {
   })
 })
 
-// function deleteComment(commentId){
-//   const commentsSection = document.querySelector('#comments')
-//   fetch(`https://randopic.herokuapp.com/comments/${:commentId}`, {
-//     method: "DELETE"
-//   })
+function deleteComment(commentId){
+  const commentsSection = document.querySelector('#comments')
+  fetch(`https://randopic.herokuapp.com/comments/${commentId}`, {
+    method: "DELETE"
+  })
 
-//   console.log(document.querySelector(`li[data-comment-id="${commentId}]`))
-//   commentsSection.removeChild(document.querySelector(`li[dataset.commentId="${commentId}]"`))
-// }
+  console.log(document.querySelector(`li [data-comment-id="${commentId}"]`))
+  commentsSection.removeChild(document.querySelector(`li [data-comment-id="${commentId}"]`).parentNode)
+}
 
 function populateImgCard(imgObj){
   const imgCard = document.querySelector('#image_card')
@@ -83,19 +89,12 @@ function incrementLikes(id) {
 function createNewComment(imageId){
   const commentsSection = document.querySelector("#comments")
   const commentInput = document.querySelector("#comment_input")
-  let newCommentLi = document.createElement('li')
-  let newComment = new Comment(imageId, commentInput.value)
-
-  newCommentLi.innerText= newComment.content
-  let newCommentId = persistNewComment(newComment)
+  let newCommentLi = new Comment({
+    id: parseInt(commentsSection.lastChild.querySelector('button').getAttribute('data-comment-id')) + 1,
+    content: commentInput.value
+  })
   
-  let deleteButton = document.createElement('button')
-  deleteButton.className = "delete-button"
-  deleteButton.dataset.commentId = newCommentId
-  deleteButton.innerText = "delete"
-  newCommentLi.appendChild(deleteButton)
-  
-  commentsSection.appendChild(newCommentLi)
+  commentsSection.appendChild(newCommentLi.render())
 }
 
 function populateCommentSection(imgObj) {
